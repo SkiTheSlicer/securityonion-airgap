@@ -3,6 +3,19 @@
 # Ref: /var/www/so/squert/.scripts/squert.sql
 # Req: http://repo.mysql.com/apt/ubuntu/pool/connector-python-2.1/m/mysql-connector-python/
 
+def parse_arguments():
+  import argparse
+  import os
+  import sys
+  parser = argparse.ArgumentParser(
+    prog='squert_ip2c_update.py',
+    description='Update SQueRT\'s ip2c table in Security Onion.',
+    epilog='Created by SkiTheSlicer (https://github.com/SkiTheSlicer)')
+    #formatter_class=argparse.RawTextHelpFormatter)
+  parser.add_argument('-d', '--source-dir',
+                      nargs='?',
+                      help='Specifies directory containing RIR updates.')
+  return parser.parse_args()
 
 def read_table(db_name, table_name):
   import mysql.connector
@@ -156,7 +169,7 @@ def create_tmp_file(source_dir, temp_file):
         print "Parsing " + item + " to " + os.path.basename(temp_file) + "..."
         entry_skipped = 0
         entry_added = 0
-        with open(item, 'rb') as input_file:
+        with open(os.path.join(source_dir, item), 'rb') as input_file:
           csvreader = csv.reader(input_file, delimiter='|')
           for row in csvreader:
             if not row[0].startswith('#') and row[2] == 'ipv4' and row[3] != '*':
@@ -222,13 +235,15 @@ def convert_country_code(country_code, countries_file):
 
 def main():
   import os
+  args = parse_arguments()
   try:
     csv_file = os.path.join(os.environ['tmp'], 'ip2c-results.csv')
   except:
     csv_file = os.path.join('/tmp', 'ip2c-results.csv')
   ##create_table("securityonion_db", "ip2c")
-  create_tmp_file('.', csv_file)
+  create_tmp_file(args.source_dir, csv_file)
   update_table("securityonion_db", "ip2c", csv_file)
   read_table("securityonion_db", "ip2c")
 
-main()
+if __name__ == "__main__":
+  main()
