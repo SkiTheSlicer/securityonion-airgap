@@ -9,7 +9,7 @@ def parse_arguments():
   import os
   datetime_now = datetime.now().strftime('%Y%m%d-%H%M')
   parser = argparse.ArgumentParser(
-    prog='securityonion-airgap-download.py',
+    prog='securityonion_airgap_download.py',
     description='Download updates for tools within Security Onion.',
     epilog='Created by SkiTheSlicer (https://github.com/SkiTheSlicer)')
     #formatter_class=argparse.RawTextHelpFormatter)
