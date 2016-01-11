@@ -18,13 +18,14 @@ This project is meant to address managing a [Security Onion](https://security-on
   - Requires [BeautifulSoup4](http://www.crummy.com/software/BeautifulSoup/bs4/download/) Python library.
   - Requires [requests](http://docs.python-requests.org/en/latest/user/install/#install) Python library (already included in Security Onion 14).
 2. Offline Updater (securityonion_airgap_update.py)
+  - Handles decompressing tarball from downloader and passes switches to respective sub-script updaters.
   1. SQueRT Updater (squert_ip2c_update.py).
     - Requires [mysql.connector](https://dev.mysql.com/downloads/connector/python/) Python library.
     - Requires MySQL root (SELECT, DROP, CREATE, INSERT, LOAD), but not OS root.
     - Master server only.
     - Based on ip2c.tcl and squert.sql in /var/www/so/squert/.scripts/
   2. Snort & Bro Updater (ids_offline_update.py).
-    - Requires OS root. 
+    - Requires OS root to access priviledged directories.
     - Master server for Snort rules and GeoIP files.
     - Sensor server for GeoIP files.
 ##Example Download

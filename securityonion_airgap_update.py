@@ -56,11 +56,11 @@ def main():
   elif not os.path.isdir(args.input_file):
     if os.path.exists('.'.join([args.input_file, 'md5'])):
       compare_md5s(os.path.dirname(os.path.abspath(args.input_file)))
-    #decompress_tarfile(args.input_file)
+    decompress_tarfile(args.input_file)
     base_dir = args.input_file[:-7]
     script_dir = os.path.dirname(os.path.realpath(__file__))
     ip2c_script = script_dir + '/squert_ip2c_update.py'
-    ip2c_cmd = script_dir + '/squert_ip2c_update.py -d ' + os.path.join(base_dir, 'RIR')
+    #ip2c_cmd = script_dir + '/squert_ip2c_update.py -d ' + os.path.join(base_dir, 'RIR')
     #print os.path.abspath(base_dir)
     if args.geoip:
       print 'Do geoip'
