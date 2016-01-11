@@ -28,51 +28,49 @@ def parse_arguments():
   return parser.parse_args()
 
 def main():
-  #import os
+  import os
   import subprocess
   import re
-  import os
   import tarfile
   args = parse_arguments()
   if args.geoip:
-    #listdir; if v6 exists, ask about v6; if city exists, ask about city.
-    geoips_available = []
-    geoip_paths = []
+    geoip_country_paths = []
+    geoip_city_paths = []
     for root, dirs, files in os.walk(args.geoip_dir):
       for file in files:
         if file == 'GeoIP.dat':
-          geoips_available.append('GeoIPv4 Country')
-          geoip_paths.append(os.path.abspath(os.path.join(root, file)))
-          #geoip_v4_path = os.path.abspath(os.path.join(root, file))
-          #print 'geoip_v4_path: ' + geoip_v4_path
+          geoip_country_paths.append(os.path.abspath(os.path.join(root, file)))
         elif file == 'GeoIPv6.dat':
-          geoips_available.append('GeoIPv6 Country')
-          geoip_paths.append(os.path.abspath(os.path.join(root, file)))
-          #geoip_v6_path = os.path.abspath(os.path.join(root, file))
-          #print 'geoip_v6_path: ' + geoip_v6_path
+          geoip_country_paths.append(os.path.abspath(os.path.join(root, file)))
         elif file == 'GeoLiteCity.dat':
-          geoips_available.append('GeoIPv4 City')
-          geoip_paths.append(os.path.abspath(os.path.join(root, file)))
-          #geoip_city_v4_path = os.path.abspath(os.path.join(root, file))
-          #print 'geoip_city_v4_path: ' + geoip_city_v4_path
+          geoip_city_paths.append(os.path.abspath(os.path.join(root, file)))
         elif file == 'GeoLiteCityv6.dat':
-          geoips_available.append('GeoIPv6 City')
-          geoip_paths.append(os.path.abspath(os.path.join(root, file)))
-          #geoip_city_v6_path = os.path.abspath(os.path.join(root, file))
-          #print 'geoip_city_v6_path: ' + geoip_city_v6_path
-    print geoips_available
-    print geoip_paths
-    for path in geoip_paths:
-      subprocess.call(['cp', path, '/tmp/'])
+          geoip_city_paths.append(os.path.abspath(os.path.join(root, file)))
+    selection_names = []
+    selection_paths = []
+    if len(geoip_country_paths) > 0:
+        selection_names.append('Only Update GeoIP Country DBs')
+        selection_paths.append(geoip_country_paths)
+    if len(geoip_city_paths) > 0:
+        selection_names.append('Only Update GeoIP City DBs')
+        selection_paths.append(geoip_city_paths)
+    if len(geoip_country_paths) > 0 and len(geoip_city_paths) > 0:
+        selection_names.append('Update GeoIP Country and City DBs')
+        selection_paths.append(geoip_country_paths + geoip_city_paths)
+    print 'NUMBER\tOPTION\n------\t------'
+    for idx, val in enumerate(selection_names):
+      print str(idx) + '\t' + val
+    selection = input('Specify update option\'s number: ')
+    try:
+      print 'You selected: ' + str(selection_paths[selection])
+    except IndexError:
+      print 'ERROR: Invalid Selection.'
+    for path in selection_paths[selection]:
+      subprocess.call(['sudo', 'cp', path, '/usr/share/GeoIP/'])
       if 'GeoLiteCity.dat' in path:
-        subprocess.call(['ln', '-s', '/tmp/GeoLiteCity.dat', '/tmp/GeoIPCity.dat'])
+        subprocess.call(['sudo', 'ln', '-s', '/usr/share/GeoIP/GeoLiteCity.dat', '/usr/share/GeoIP/GeoIPCity.dat'])
       elif 'GeoLiteCityv6.dat' in path:
-        subprocess.call(['ln', '-s', '/tmp/GeoLiteCityv6.dat', '/tmp/GeoIPCityv6.dat'])
-      #subprocess.call(['sudo', 'cp', path, '/usr/share/GeoIP/'])
-      #if 'GeoLiteCity.dat' in path:
-      #  subprocess.call(['sudo', 'ln', '-s', '/usr/share/GeoIP/GeoLiteCity.dat', '/usr/share/GeoIP/GeoIPCity.dat'])
-      #elif 'GeoLiteCityv6.dat' in path:
-      #  subprocess.call(['sudo', 'ln', '-s', '/usr/share/GeoIP/GeoLiteCityv6.dat', '/usr/share/GeoIP/GeoIPCityv6.dat'])
+        subprocess.call(['sudo', 'ln', '-s', '/usr/share/GeoIP/GeoLiteCityv6.dat', '/usr/share/GeoIP/GeoIPCityv6.dat'])
   elif args.rules:
     #listdir; if blacklist exists, ask about blacklist; if ET exists, ask about ET; if VRT exists, ask about VRT. Mirror this off sosetup choices?
     #md5pattern = re.compile("(^|[^0-9a-f])([0-9a-f]{32})([^0-9a-f]|$)")
