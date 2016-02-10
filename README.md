@@ -1,6 +1,8 @@
 #SecurityOnion-AirGap
+
 ##Purpose
 This project is meant to address managing a [Security Onion](https://security-onion-solutions.github.io/security-onion/) deployment inside an [air gapped](https://en.wikipedia.org/wiki/Air_gap_(networking)) network.
+
 ##Considerations
 1. [Snort](https://snort.org/)
   - Snort rule updates. Security Onion comes ships with an old ruleset from Emerging Threats. It is meant to be updated during sosetup and then by cron job.
@@ -11,25 +13,32 @@ This project is meant to address managing a [Security Onion](https://security-on
   - GeoIP updates. Bro relies on GeoIP data files to assign country codes to its log entries. Security Onion ships with old versions of GeoIP.dat and GeoIPv6.dat. It does not have GeoIPCity.dat.
 4. [Ubuntu](http://www.ubuntu.com/)
   - OS Updates. This should be an obvious consideration, but I will not be addressing it at this time. It is updated by apt-get/soup.
+  - See [securityonion-utils/mirror_repo.py](https://github.com/SkiTheSlicer/securityonion-utils/blob/master/mirror_repo.py)
+
 ##Components
 *Scripts were written in [Python 2.7.6](https://www.python.org/download/releases/2.7.6/)*
 *Initial development was under Security Onion 12.04.5.3 and continued under 14.04.3.1*
+
 1. Online Downloader (securityonion_airgap_download.py)
   - Requires [BeautifulSoup4](http://www.crummy.com/software/BeautifulSoup/bs4/download/) Python library.
   - Requires [requests](http://docs.python-requests.org/en/latest/user/install/#install) Python library (already included in Security Onion 14).
+
 2. Offline Updater (securityonion_airgap_update.py)
   - Handles decompressing tarball from downloader and passes switches to respective sub-script updaters.
+  
   1. SQueRT Updater (squert_ip2c_update.py).
     - Requires [mysql.connector](https://dev.mysql.com/downloads/connector/python/) Python library.
     - Requires MySQL root (SELECT, DROP, CREATE, INSERT, LOAD), but not OS root.
     - Master server only.
     - Based on ip2c.tcl and squert.sql in /var/www/so/squert/.scripts/
+  
   2. Snort & Bro Updater (ids_offline_update.py).
     - Requires OS root to access priviledged directories.
     - Master server for Snort rules and GeoIP files.
     - Sensor server for GeoIP files.
+
 ##Example Download
-    $ python securityonion_airgap_download.py -e \*\*\*\*\*@\*\*\*\*\*.com
+    $ python securityonion_airgap_download.py -e *****@*****.com
 *Email address has been sanitized.*
 ```
 Output Dir: so-airgap-20160109-1757
@@ -121,5 +130,6 @@ Compressing so-airgap-20160109-1757...
 -rw-r--r-- 1 skitheslicer skitheslicer 131M Jan  9 18:02 so-airgap-20160109-1757.tar.gz
 -rw-r--r-- 1 skitheslicer skitheslicer   63 Jan  9 18:02 so-airgap-20160109-1757.tar.gz.md5
 ```
+
 ##Example Update
 *TBD*
