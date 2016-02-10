@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# 20160109  https://github.com/SkiTheSlicer
+# Created by https://github.com/SkiTheSlicer
 
 #from securityonion_airgap_download import compare_md5s
 
@@ -11,7 +11,6 @@ def parse_arguments():
     prog='securityonion_airgap_update.py',
     description='Update tools within Security Onion.',
     epilog='Created by SkiTheSlicer (https://github.com/SkiTheSlicer)')
-    #formatter_class=argparse.RawTextHelpFormatter)
   parser.add_argument('-f', '--input-file',
                       nargs='?',
                       help='Specifies compressed archive containing updates')
@@ -61,21 +60,26 @@ def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     ip2c_script = script_dir + '/squert_ip2c_update.py'
     #ip2c_cmd = script_dir + '/squert_ip2c_update.py -d ' + os.path.join(base_dir, 'RIR')
+    ids_script = script_dir + '/ids_offline_update.py'
     #print os.path.abspath(base_dir)
     if args.geoip:
       print 'Do geoip'
+      subprocess.call(['python', ids_script, '--geoip', '-G' + os.path.join(os.path.abspath(base_dir), 'GeoIP')])
     elif args.rules:
       print 'Do rules'
+      # what about Doing blacklist?
+      subprocess.call(['python', ids_script, '--rules', '-R' + os.path.join(os.path.abspath(base_dir), 'Snort')])
     elif args.ip2c:
       print 'Do ip2c'
-      #subprocess.call(['python', ip2c_script, '-h'])
-      #subprocess.call(['python', ip2c_cmd])
+      ##subprocess.call(['python', ip2c_script, '-h'])
+      ##subprocess.call(['python', ip2c_cmd])
       subprocess.call(['python', ip2c_script, '-d' + os.path.join(os.path.abspath(base_dir), 'RIR')])
-      #subprocess.call(['sudo', 'python', ip2c_script, '-d' + os.path.join(os.path.abspath(base_dir), 'RIR')])
+      ##subprocess.call(['sudo', 'python', ip2c_script, '-d' + os.path.join(os.path.abspath(base_dir), 'RIR')])
     else:
-      print 'Do geoip'
-      print 'Do rules'
+      print 'Do geoip & Do rules'
+      subprocess.call(['python', ids_script, '-B' + os.path.join(os.path.abspath(base_dir), 'Snort', 'Blacklist'), '-G' + os.path.join(os.path.abspath(base_dir), 'GeoIP'), '-R' + os.path.join(os.path.abspath(base_dir), 'Snort')])
       print 'Do ip2c'
+      subprocess.call(['python', ip2c_script, '-d' + os.path.join(os.path.abspath(base_dir), 'RIR')])
 
 if __name__ == "__main__":
   main()
