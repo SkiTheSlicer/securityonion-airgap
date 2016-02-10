@@ -27,3 +27,4 @@
 - [ ] Add numbered option to skip blacklist (or overwrite instead of append).
 - [ ] Add VRT Paid Ruleset check
 - [ ] Add answer file capabilites for geoip, blacklist, ruleset selection options.
+- [ ] Add ability to manipulate pulledpork based on ruleset response.
