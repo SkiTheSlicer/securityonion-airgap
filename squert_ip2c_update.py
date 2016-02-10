@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Created by https://github.com/SkiTheSlicer
 # Ref: /var/www/so/squert/.scripts/ip2c.tcl
 # Ref: /var/www/so/squert/.scripts/squert.sql
 # Req: http://repo.mysql.com/apt/ubuntu/pool/connector-python-2.1/m/mysql-connector-python/
@@ -20,7 +21,7 @@ def parse_arguments():
 def read_table(db_name, table_name):
   import mysql.connector
   import os
-  print "\nReading table " + table_name
+  print "Reading table " + table_name
  #Connect to database
   config = {
     'user': 'root',
@@ -49,7 +50,7 @@ def read_table(db_name, table_name):
   cnx.close()
 
 def create_table(db_name, table_name):
-  print "\n(Re)Creating table " + table_name
+  print "(Re)Creating table " + table_name
   import mysql.connector
  #Connect to database
   config = {
@@ -105,7 +106,7 @@ def update_table(db_name, table_name, input_file):
   import os
   import sys
   import mysql.connector
-  print "\nUpdating table " + table_name + " from " + input_file
+  print "Updating table " + table_name + " from " + input_file
  #Ensure results file exists
   if not os.path.exists(input_file):
     print "No temp file"
@@ -142,13 +143,13 @@ def update_table(db_name, table_name, input_file):
   cursor.close()
   cnx.close()
   os.remove(input_file)
-  print "\nUpdate complete"
+  print "Update complete"
 
 def create_tmp_file(source_dir, temp_file):
   import os
   import csv
   #import re
-  print "\nCreating temp file " + temp_file + " from dir " + source_dir
+  print "Creating temp file " + temp_file + " from dir " + source_dir
   if os.path.exists("/var/www/so/squert/.inc/countries.php"):
     country_php = "/var/www/so/squert/.inc/countries.php"
   elif os.path.exists("/var/www/squert/.inc/countries.php"):
@@ -234,6 +235,13 @@ def convert_country_code(country_code, countries_file):
   return country_name
 
 def main():
+  try:
+    import mysql.connector
+  except:
+    import sys
+    print "\n[IP2C: WARNING]"
+    print 'ERROR: mysql.connector library not available. Exitting...'
+    sys.exit(1)
   import os
   args = parse_arguments()
   try:
@@ -241,8 +249,11 @@ def main():
   except:
     csv_file = os.path.join('/tmp', 'ip2c-results.csv')
   ##create_table("securityonion_db", "ip2c")
+  print "\n[IP2C: Parse RIR DBs]"
   create_tmp_file(args.source_dir, csv_file)
+  print "\n[IP2C: Update MySQL DB]"
   update_table("securityonion_db", "ip2c", csv_file)
+  print "\n[IP2C: Update Validation]"
   read_table("securityonion_db", "ip2c")
 
 if __name__ == "__main__":
