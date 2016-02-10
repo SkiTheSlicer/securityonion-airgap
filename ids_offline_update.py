@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Created by https://github.com/SkiTheSlicer
 
 def parse_arguments():
   import argparse
@@ -33,20 +34,20 @@ def check_for_warnings():
   import os
   import subprocess
   warn_msgs = []
-  if not os.path.exists('/var/log/sosetup.log'):
-    warn_msgs.append('WARNING! No sosetup.log; running sosetup may overwrite these changes.')
+  if not os.path.exists('/var/log/sosetup.log') and not os.path.exists('/var/log/nsm/sosetup.log'):
+    warn_msgs.append('WARNING: No sosetup.log; running sosetup may overwrite these changes.')
   existing_dbs = subprocess.Popen(['mysql', '-u', 'root', '-e', 'SHOW DATABASES'], stdout=subprocess.PIPE)
   if not 'securityonion_db' in existing_dbs.stdout.read():
-    warn_msgs.append('WARNING! No securityonion_db; not master or sosetup not run.')
+    warn_msgs.append('WARNING: No securityonion_db; not master or sosetup not run.')
   try:
     with open('/etc/nsm/rules/black_list.rules', 'r') as f:
       for i, l in enumerate(f):
         pass
       i = i + 1
     if i > 0:
-      warn_msgs.append('WARNING! black_list.rules not empty.')
+      warn_msgs.append('WARNING: black_list.rules not empty.')
   except:
-    warn_msgs.append('WARNING! black_list.rules file doesn\'t exist.')
+    warn_msgs.append('WARNING: black_list.rules file doesn\'t exist.')
   return warn_msgs
 
 def update_geoip_dbs(directory_to_walk):
@@ -148,7 +149,7 @@ def update_snort_rules(directory_to_walk):
     for path in selection_paths[selection]:
       print 'Copying ' + os.path.basename(path) + ' to \'/opt/emergingthreats/\' and \'/tmp/\'...'
       subprocess.call(['sudo', 'cp', path, '/opt/emergingthreats/'])
-      subprocess.call(['cp', path, '/tmp/'])
+      subprocess.call(['sudo', 'cp', path, '/tmp/'])
   except IndexError:
     print 'ERROR: Invalid Selection.'
 
@@ -198,46 +199,46 @@ def main():
   args = parse_arguments()
   warn_msgs = check_for_warnings()
   if len(warn_msgs) > 0:
-    print "\n[WARNING]"
+    print "\n[IDS: WARNING]"
     for warn_msg in warn_msgs:
       print warn_msg
     if not args.ignore_warnings:
-      input("Press Enter to continue...")
+      raw_input("Press Enter to continue...")
   if not os.path.exists(args.blacklists_dir):
-    print args.blacklists_dir + ' doesn\'t exist. Exitting.'
+    print 'ERROR: ' + args.blacklists_dir + ' doesn\'t exist. Exitting.'
     sys.exit(1)
   elif not os.path.isdir(args.blacklists_dir):
-    print args.blacklists_dir + ' is invalid directory. Exitting.'
+    print 'ERROR: ' + args.blacklists_dir + ' is invalid directory. Exitting.'
     sys.exit(1)
   if not os.path.exists(args.geoip_dir):
-    print args.geoip_dir + ' doesn\'t exist. Exitting.'
+    print 'ERROR: ' + args.geoip_dir + ' doesn\'t exist. Exitting.'
     sys.exit(1)
   elif not os.path.isdir(args.geoip_dir):
-    print args.geoip_dir + ' is invalid directory. Exitting.'
+    print 'ERROR: ' + args.geoip_dir + ' is invalid directory. Exitting.'
     sys.exit(1)
   if not os.path.exists(args.rules_dir):
-    print args.rules_dir + ' doesn\'t exist. Exitting.'
+    print 'ERROR: ' + args.rules_dir + ' doesn\'t exist. Exitting.'
     sys.exit(1)
   elif not os.path.isdir(args.rules_dir):
-    print args.rules_dir + ' is invalid directory. Exitting.'
+    print 'ERROR: ' + args.rules_dir + ' is invalid directory. Exitting.'
     sys.exit(1)
   if args.blacklists:
-    print "\n[Snort Blacklists]"
+    print "\n[IDS: Snort Blacklists]"
     update_snort_blacklists(args.blacklists_dir)
   elif args.geoip:
-    print "\n[Bro GeoIP DBs]"
+    print "\n[IDS: Bro GeoIP DBs]"
     update_geoip_dbs(args.geoip_dir)
   elif args.rules:
-    print "\n[Snort Rules]"
+    print "\n[IDS: Snort Rules]"
     update_snort_rules(args.rules_dir)
   else:
-    print "\n[Snort Blacklists]"
+    print "\n[IDS: Snort Blacklists]"
     update_snort_blacklists(args.blacklists_dir)
-    print "\n[Bro GeoIP DBs]"
+    print "\n[IDS: Bro GeoIP DBs]"
     update_geoip_dbs(args.geoip_dir)
-    print "\n[Snort Rules]"
+    print "\n[IDS: Snort Rules]"
     update_snort_rules(args.rules_dir)
-  print '\n[Final]\nPlease run \'rule-update\' to complete the Snort update, if applicable.'
+  print '\n[IDS: Final]\nPlease run \'rule-update\' to complete the Snort update, if applicable.'
 
 if __name__ == "__main__":
   main()
