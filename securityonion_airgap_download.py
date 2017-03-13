@@ -227,7 +227,7 @@ def main():
   urls_snort_static = [
     ["VRT_Community", "https://www.snort.org/downloads/community/community-rules.tar.gz"],
     ["VRT_Community", "https://www.snort.org/downloads/community/md5s"],
-    ["Blacklist", "http://labs.snort.org/feeds/ip-filter.blf"],
+    ["Blacklist", "http://www.talosintelligence.com/feeds/ip-filter.blf"],
     ["Blacklist", "http://rules.emergingthreats.net/blockrules/compromised-ips.txt"]
   ]#["VRT_Community", "https://www.snort.org/downloads/community/opensource.tar.gz"],
   for url in urls_snort_static:
